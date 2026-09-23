@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Latitude — a darkroom, mailed monthly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1613;
+    --charcoal:#251F1B;
+    --paper:#EFE7D6;
+    --paper-dim:#C9C0AC;
+    --safelight:#C1502E;
+    --safelight-dim:#8C3A22;
+    --olive:#7C7365;
+    --line: rgba(239,231,214,0.14);
+    font-family:'Archivo', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-padding-top:calc(72px + env(safe-area-inset-top, 0px));}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    line-height:1.5;
+    padding-top:env(safe-area-inset-top, 0px);
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+    overflow-x:hidden;
+  }
+  img,svg{max-width:100%; display:block;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:500; letter-spacing:-0.01em;}
+
+  /* Nav */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    top:env(safe-area-inset-top, 0px);
+    background:rgba(27,22,19,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; max-width:1120px; margin:0 auto;
+  }
+  .brand{font-family:'Fraunces', serif; font-size:1.25rem; font-weight:600; color:var(--paper);}
+  .brand em{font-style:normal; color:var(--safelight);}
+  .nav-links{display:flex; gap:32px; font-size:0.95rem; color:var(--paper-dim);}
+  .nav-links a:hover{color:var(--paper);}
+  .nav-cta{
+    background:var(--safelight); color:var(--paper); font-size:0.9rem;
+    padding:9px 18px; border-radius:2px; font-weight:500;
+  }
+  .nav-cta:hover{background:var(--safelight-dim);}
+  .menu-toggle{display:none;}
+
+  /* Hero */
+  .hero{
+    padding:96px 0 88px;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:center;
+  }
+  .hero-eyebrow{color:var(--olive); font-size:0.95rem; margin-bottom:18px; max-width:34ch;}
+  .hero h1{
+    font-size:clamp(2.4rem, 5vw, 3.6rem); line-height:1.06; color:var(--paper);
+    max-width:14ch;
+  }
+  .hero p.sub{
+    margin-top:22px; font-size:1.08rem; color:var(--paper-dim); max-width:42ch; line-height:1.6;
+  }
+  .hero-ctas{display:flex; gap:16px; margin-top:34px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--safelight); color:var(--paper); padding:14px 26px;
+    border-radius:2px; font-weight:500; font-size:1rem;
+  }
+  .btn-primary:hover{background:var(--safelight-dim);}
+  .btn-secondary{
+    border:1px solid var(--line); color:var(--paper); padding:13px 26px;
+    border-radius:2px; font-size:1rem;
+  }
+  .btn-secondary:hover{border-color:var(--paper-dim);}
+  .hero-note{margin-top:20px; font-size:0.85rem; color:var(--olive);}
+
+  .hero-art{position:relative;}
+  .hero-art svg{width:100%; height:auto;}
+
+  /* Sections */
+  section{padding:80px 0;}
+  .section-head{max-width:52ch; margin-bottom:48px;}
+  .section-head .kicker{color:var(--safelight); font-size:0.95rem; margin-bottom:10px;}
+  .section-head h2{font-size:clamp(1.7rem, 3vw, 2.3rem); color:var(--paper);}
+  .section-head p{margin-top:14px; color:var(--paper-dim); font-size:1.02rem;}
+
+  section.box{background:var(--charcoal); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+  .box-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .box-item{background:var(--charcoal); padding:32px 26px;}
+  .box-item svg{width:34px; height:34px; margin-bottom:18px;}
+  .box-item h3{color:var(--paper); font-size:1.08rem; margin-bottom:8px; font-weight:500;}
+  .box-item p{color:var(--paper-dim); font-size:0.94rem; line-height:1.55;}
+
+  /* How it works */
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:40px; counter-reset:step;}
+  .step{border-top:1px solid var(--line); padding-top:22px;}
+  .step .num{font-family:'Fraunces', serif; font-size:1.6rem; color:var(--safelight); display:block; margin-bottom:12px;}
+  .step h3{color:var(--paper); font-size:1.12rem; margin-bottom:10px; font-weight:500;}
+  .step p{color:var(--paper-dim); font-size:0.96rem; line-height:1.6;}
+
+  /* Testimonials */
+  section.notes{background:var(--ink);}
+  .notes-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:28px;}
+  .note{
+    background:var(--charcoal); border:1px solid var(--line); border-radius:2px;
+    padding:30px 28px; display:flex; flex-direction:column; justify-content:space-between; min-height:220px;
+  }
+  .note blockquote{color:var(--paper); font-size:1.02rem; line-height:1.6; font-family:'Fraunces', serif; font-weight:400;}
+  .note cite{display:block; margin-top:22px; font-style:normal; color:var(--olive); font-size:0.88rem;}
+
+  /* CTA band */
+  section.cta-band{
+    background:var(--safelight); color:var(--paper);
+    text-align:left;
+  }
+  .cta-band .wrap{display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;}
+  .cta-band h2{color:var(--paper); font-size:clamp(1.6rem,3vw,2.1rem); max-width:20ch;}
+  .cta-band .btn-primary{background:var(--ink);}
+  .cta-band .btn-primary:hover{background:#000;}
+
+  /* Footer */
+  footer{border-top:1px solid var(--line); padding:56px 0 40px;}
+  .foot-grid{
+    display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; margin-bottom:44px;
+  }
+  .foot-brand{font-family:'Fraunces', serif; font-size:1.15rem; color:var(--paper); margin-bottom:12px;}
+  .foot-grid p{color:var(--olive); font-size:0.92rem; max-width:32ch; line-height:1.6;}
+  .foot-col h4{color:var(--paper-dim); font-size:0.85rem; font-weight:500; margin-bottom:14px;}
+  .foot-col a{display:block; color:var(--olive); font-size:0.92rem; margin-bottom:10px;}
+  .foot-col a:hover{color:var(--paper);}
+  .foot-bottom{
+    border-top:1px solid var(--line); padding-top:24px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    color:var(--olive); font-size:0.85rem;
+  }
+
+  @media (prefers-color-scheme: light){ :root{ } }
+
+  @media (max-width: 860px){
+    .nav-links{display:none;}
+    .hero{grid-template-columns:1fr; padding:64px 0 56px;}
+    .hero-art{order:-1; max-width:280px; margin:0 auto;}
+    .box-grid{grid-template-columns:repeat(2,1fr);}
+    .steps{grid-template-columns:1fr; gap:28px;}
+    .notes-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr 1fr; row-gap:32px;}
+    .cta-band .wrap{flex-direction:column; align-items:flex-start;}
+  }
+  @media (max-width: 480px){
+    .wrap{padding:0 20px;}
+    .box-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <nav>
+    <a class="brand" href="#top">Lat<em>itude</em></a>
+    <div class="nav-links">
+      <a href="#box">What's inside</a>
+      <a href="#how">How it works</a>
+      <a href="#notes">Notes from members</a>
+    </div>
+    <a class="nav-cta" href="#join">Join</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:center; padding:0;">
+      <div>
+        <p class="hero-eyebrow">A film, chemistry and paper subscription for people who still develop their own rolls.</p>
+        <h1>Your darkroom, refilled every month.</h1>
+        <p class="sub">Latitude ships a hand-picked roll of film, fresh developer and fixer, and a few sheets of paper to print on — timed so you never run out mid-roll.</p>
+        <div class="hero-ctas">
+          <a class="btn-primary" href="#join">Start your subscription</a>
+          <a class="btn-secondary" href="#box">See what's inside</a>
+        </div>
+        <p class="hero-note">$34 a month. Pause or cancel from your account anytime.</p>
+      </div>
+      <div class="hero-art">
+        <svg viewBox="0 0 360 420" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="360" height="420" fill="none"/>
+          <circle cx="180" cy="150" r="118" fill="none" stroke="var(--line)" stroke-width="1"/>
+          <circle cx="180" cy="150" r="86" fill="none" stroke="var(--safelight)" stroke-width="1.5"/>
+          <line x1="180" y1="150" x2="180" y2="80" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="180" y1="150" x2="228" y2="150" stroke="var(--safelight)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="180" cy="150" r="4" fill="var(--paper)"/>
+          <text x="180" y="60" text-anchor="middle" fill="var(--olive)" font-family="Archivo" font-size="12">3:30</text>
+          <g stroke="var(--paper-dim)" stroke-width="1">
+            <rect x="40" y="300" width="280" height="70" rx="2" fill="var(--charcoal)"/>
+            <line x1="40" y1="312" x2="320" y2="312"/>
+            <line x1="40" y1="358" x2="320" y2="358"/>
+            <line x1="76" y1="300" x2="76" y2="370"/>
+            <line x1="112" y1="300" x2="112" y2="370"/>
+            <line x1="148" y1="300" x2="148" y2="370"/>
+            <line x1="184" y1="300" x2="184" y2="370"/>
+            <line x1="220" y1="300" x2="220" y2="370"/>
+            <line x1="256" y1="300" x2="256" y2="370"/>
+            <line x1="292" y1="300" x2="292" y2="370"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="box" id="box">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">What's inside</p>
+        <h2>Four things, chosen to run out together.</h2>
+        <p>Every box is built around one roll of film, so the chemistry and paper inside are sized to match — nothing left over, nothing missing.</p>
+      </div>
+      <div class="box-grid">
+        <div class="box-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="var(--safelight)" stroke-width="1.5"><rect x="10" y="6" width="20" height="28" rx="2"/><circle cx="20" cy="14" r="4"/><line x1="14" y1="24" x2="26" y2="24"/><line x1="14" y1="29" x2="26" y2="29"/></svg>
+          <h3>One roll of film</h3>
+          <p>A different stock each month — black and white or color, picked for the season and explained in the insert card.</p>
+        </div>
+        <div class="box-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="var(--safelight)" stroke-width="1.5"><path d="M16 6h8v6l4 4v18a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V16l4-4V6z"/><line x1="14" y1="20" x2="26" y2="20"/></svg>
+          <h3>Developer &amp; fixer</h3>
+          <p>Pre-measured for a single roll, in resealable pouches — mix what you need and store the rest for next time.</p>
+        </div>
+        <div class="box-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="var(--safelight)" stroke-width="1.5"><rect x="9" y="9" width="22" height="22" rx="1"/><rect x="14" y="14" width="12" height="12" rx="1"/></svg>
+          <h3>Printing paper</h3>
+          <p>A small pack of resin-coated paper, enough for a contact sheet and a handful of test prints.</p>
+        </div>
+        <div class="box-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="var(--safelight)" stroke-width="1.5"><path d="M8 30l8-16 6 10 4-6 6 12z"/><line x1="8" y1="30" x2="32" y2="30"/></svg>
+          <h3>A reading card</h3>
+          <p>Notes on the film's character, a starting exposure, and a development time for the chemistry that shipped with it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">How it works</p>
+        <h2>Set your pace, we handle the timing.</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="num">1</span>
+          <h3>Tell us your rhythm</h3>
+          <p>Shoot a roll a month or one every six weeks — set it once, and shipping follows your pace.</p>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <h3>Shoot and develop</h3>
+          <p>Your box arrives a few days before your chemistry runs dry, so there's no gap between rolls.</p>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <h3>Print or share</h3>
+          <p>Use the included paper for a contact sheet, or scan your negatives and post them to the member gallery.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" id="notes">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Notes from members</p>
+        <h2>What people say after a few boxes.</h2>
+      </div>
+      <div class="notes-grid">
+        <div class="note">
+          <blockquote>I used to buy chemistry in jugs I'd never finish before it went bad. Now I mix exactly what one roll needs.</blockquote>
+          <cite>Naomi R., shooting Tri-X since March</cite>
+        </div>
+        <div class="note">
+          <blockquote>The reading card alone is worth it. I finally understand why my negatives were coming out thin.</blockquote>
+          <cite>Devon L., second box</cite>
+        </div>
+        <div class="note">
+          <blockquote>Paused it for a busy month and picked back up without any hassle. It just waits for you.</blockquote>
+          <cite>Priya M., member since January</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" id="join">
+    <div class="wrap">
+      <h2>Your next roll is waiting to be shot.</h2>
+      <a class="btn-primary" href="#top">Start your subscription</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">Latitude</div>
+        <p>A monthly darkroom box for people who develop their own film. Based in Portland, shipped everywhere.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#box">What's inside</a>
+        <a href="#how">How it works</a>
+        <a href="#join">Pricing</a>
+      </div>
+      <div class="foot-col">
+        <h4>Contact</h4>
+        <a href="mailto:hello@latitude.example">hello@latitude.example</a>
+        <a href="tel:+15035550119">+1 (503) 555-0119</a>
+      </div>
+      <div class="foot-col">
+        <h4>Follow</h4>
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Latitude Supply Co.</span>
+      <span>Portland, Oregon</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
