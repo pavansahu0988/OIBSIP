@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ada Lovelace — The Enchantress of Numbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lato:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1420; --ink2:#241A2B; --parchment:#F6EFE1; --parchment2:#EFE4CE;
+    --gold:#C9A24B; --gold-light:#E0C078; --text-dark:#2B2320; --muted:#6B5F55;
+    --cream-text:#EDE4D6; --line-dark:rgba(237,228,214,0.14); --line-light:rgba(43,35,32,0.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Lato', sans-serif; background:var(--parchment); color:var(--text-dark);
+    line-height:1.65; overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Playfair Display', serif; font-weight:600; letter-spacing:-0.005em;}
+  .wrap{max-width:880px; margin:0 auto; padding:0 28px;}
+  a{color:inherit;}
+
+  /* Hero */
+  .hero{
+    background:radial-gradient(ellipse at top, var(--ink2), var(--ink) 70%);
+    color:var(--cream-text); padding:80px 0 64px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0; opacity:0.06; pointer-events:none;
+    background-image:radial-gradient(circle, var(--gold) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  .hero-inner{position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; text-align:center;}
+  .portrait{width:200px; height:200px; margin-bottom:28px;}
+  .eyebrow{color:var(--gold-light); font-size:0.86rem; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px;}
+  .hero h1{font-size:clamp(2.2rem, 6vw, 3.4rem); margin-bottom:14px;}
+  .hero .tagline{font-size:1.1rem; color:var(--cream-text); opacity:0.85; max-width:44ch; font-style:italic;}
+  .hero .dates{margin-top:18px; color:var(--gold-light); font-size:0.92rem; letter-spacing:0.04em;}
+
+  section{padding:64px 0;}
+  .section-head{text-align:center; margin-bottom:40px;}
+  .section-head .kicker{color:var(--gold); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:600; margin-bottom:8px;}
+  .section-head h2{font-size:clamp(1.6rem, 3vw, 2.1rem);}
+
+  /* Bio */
+  section.bio{background:var(--parchment);}
+  .bio p{max-width:66ch; margin:0 auto 20px; font-size:1.06rem; color:var(--text-dark);}
+  .bio p:last-child{margin-bottom:0;}
+  .drop::first-letter{
+    font-family:'Playfair Display', serif; font-size:3.4rem; font-weight:700; float:left;
+    line-height:0.8; margin:6px 10px 0 0; color:var(--gold);
+  }
+
+  /* Timeline */
+  section.timeline{background:var(--ink); color:var(--cream-text);}
+  section.timeline .section-head .kicker{color:var(--gold-light);}
+  .tl{position:relative; margin-top:8px;}
+  .tl::before{content:""; position:absolute; left:19px; top:6px; bottom:6px; width:2px; background:var(--line-dark);}
+  .tl-item{position:relative; padding-left:56px; margin-bottom:34px;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-dot{
+    position:absolute; left:11px; top:3px; width:18px; height:18px; border-radius:50%;
+    background:var(--ink); border:2px solid var(--gold); z-index:1;
+  }
+  .tl-year{color:var(--gold-light); font-family:'Playfair Display', serif; font-size:1.1rem; font-weight:600; margin-bottom:4px;}
+  .tl-item h3{font-size:1.08rem; margin-bottom:6px; color:var(--cream-text);}
+  .tl-item p{color:#B8AFC2; font-size:0.96rem; max-width:56ch;}
+
+  /* Quote */
+  section.quote{background:linear-gradient(135deg, var(--ink2), var(--ink)); text-align:center; padding:76px 0;}
+  .quote blockquote{
+    font-family:'Playfair Display', serif; font-style:italic; font-weight:500;
+    font-size:clamp(1.4rem, 3.2vw, 1.9rem); color:var(--gold-light); max-width:38ch; margin:0 auto 18px;
+    line-height:1.45; position:relative;
+  }
+  .quote blockquote::before{content:"“"; color:var(--gold); opacity:0.5; font-size:2.4rem; display:block; margin-bottom:-6px;}
+  .quote cite{color:var(--cream-text); opacity:0.7; font-size:0.92rem; font-style:normal;}
+
+  /* Legacy cards */
+  section.legacy{background:var(--parchment2);}
+  .legacy-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:22px;}
+  .legacy-card{background:var(--parchment); border:1px solid var(--line-light); border-radius:12px; padding:26px;}
+  .legacy-card h3{font-size:1.05rem; margin-bottom:10px; color:var(--text-dark);}
+  .legacy-card p{color:var(--muted); font-size:0.94rem;}
+
+  footer{background:var(--ink); color:#9E93AE; text-align:center; padding:32px 0; font-size:0.85rem;}
+  footer a{color:var(--gold-light); text-decoration:underline;}
+
+  @media (max-width:720px){
+    .legacy-grid{grid-template-columns:1fr;}
+    .tl::before{left:15px;}
+    .tl-item{padding-left:44px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <svg class="portrait" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="98" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="100" cy="100" r="84" fill="#2B2136"/>
+      <g stroke="var(--gold)" stroke-width="1" opacity="0.55" fill="none">
+        <circle cx="150" cy="58" r="14"/><circle cx="150" cy="58" r="3" fill="var(--gold)"/>
+        <circle cx="46" cy="146" r="10"/><circle cx="46" cy="146" r="2" fill="var(--gold)"/>
+        <path d="M150 44v-6M150 72v6M164 58h6M136 58h-6"/>
+      </g>
+      <path d="M100 60c-20 0-30 16-30 34 0 20 12 30 12 30s-24 8-24 34v10h84v-10c0-26-24-34-24-34s12-10 12-30c0-18-10-34-30-34z" fill="#EDE4D6" opacity="0.92"/>
+      <path d="M70 96c0-20 10-36 30-36s30 16 30 36" fill="none" stroke="var(--gold)" stroke-width="1.2" opacity="0.6"/>
+    </svg>
+    <p class="eyebrow">A tribute</p>
+    <h1>Ada Lovelace</h1>
+    <p class="tagline">The Enchantress of Numbers — the mathematician who saw a future in the machine before anyone else did.</p>
+    <p class="dates">1815 – 1852</p>
+  </div>
+</header>
+
+<section class="bio" id="bio">
+  <div class="wrap">
+    <div class="section-head"><p class="kicker">Her story</p><h2>A mind ahead of its century</h2></div>
+    <p class="drop">Augusta Ada King, Countess of Lovelace, was born in London in 1815, the only legitimate child of the poet Lord Byron. Her mother, Annabella Milbanke, separated from Byron soon after Ada's birth and, wary of the "poetic madness" she associated with her husband, steered her daughter firmly toward mathematics and logic. Tutors including Mary Somerville and Augustus De Morgan shaped a young woman who came to describe her own approach as "poetical science" — a fusion of rigorous analysis and imaginative leap that would define her life's work.</p>
+    <p>In 1833, at just seventeen, Ada met the inventor Charles Babbage at a demonstration of his Difference Engine, a mechanical calculator. The two struck up a friendship and correspondence that would last the rest of her life, built on a shared fascination with Babbage's far grander, never-completed design: the Analytical Engine, a general-purpose mechanical computer decades before electricity made such machines practical.</p>
+    <p>Between 1842 and 1843, Ada translated an Italian engineer's academic paper on the Analytical Engine into English. Where the original ran to a few thousand words, her translation arrived with a set of appended notes nearly three times as long. Buried within them, labeled simply "Note G," was a step-by-step method for the engine to compute Bernoulli numbers — widely regarded today as the first algorithm ever written for execution by a machine.</p>
+    <p>What set Ada apart was not just the algorithm but the insight surrounding it. She argued that Babbage's engine could go beyond arithmetic entirely — manipulating symbols, composing music, doing anything that could be expressed in the machine's formal language. It was a conceptual leap that would not be fully realized for over a century, and it is the reason so many now consider her the first person to grasp the true potential of computing. She died in 1852, at just thirty-six, and was buried, at her own request, beside the father she never really knew.</p>
+  </div>
+</section>
+
+<section class="timeline" id="timeline">
+  <div class="wrap">
+    <div class="section-head"><p class="kicker">Milestones</p><h2>A life in brief</h2></div>
+    <div class="tl">
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1815</div>
+        <h3>Born in London</h3>
+        <p>Daughter of poet Lord Byron and mathematician Annabella Milbanke; raised on logic and science rather than verse.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1833</div>
+        <h3>Meets Charles Babbage</h3>
+        <p>At seventeen, sees a demonstration of the Difference Engine and begins a lifelong intellectual friendship with its inventor.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1842–43</div>
+        <h3>Translates and annotates</h3>
+        <p>Her English translation of Menabrea's paper on the Analytical Engine grows into a body of original notes far longer than the source.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1843</div>
+        <h3>Publishes "Note G"</h3>
+        <p>Sets out a method for the Analytical Engine to compute Bernoulli numbers — recognized today as the first published algorithm for a machine.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1852</div>
+        <h3>Dies at thirty-six</h3>
+        <p>Passes away in London and is buried beside her father, Lord Byron, as she had requested.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <div class="tl-year">1980</div>
+        <h3>The Ada programming language</h3>
+        <p>The U.S. Department of Defense names a newly developed programming language "Ada" in her honor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="wrap">
+    <blockquote>That brain of mine is something more than merely mortal.</blockquote>
+    <cite>— Ada Lovelace, in a letter to her mother</cite>
+  </div>
+</section>
+
+<section class="legacy">
+  <div class="wrap">
+    <div class="section-head"><p class="kicker">Why she matters</p><h2>Her legacy today</h2></div>
+    <div class="legacy-grid">
+      <div class="legacy-card">
+        <h3>First programmer</h3>
+        <p>Her Bernoulli number algorithm is widely cited as the first computer program, written for a machine that was never built in her lifetime.</p>
+      </div>
+      <div class="legacy-card">
+        <h3>A wider vision</h3>
+        <p>She imagined computing beyond arithmetic — an idea that took over a hundred years for the field to catch up to.</p>
+      </div>
+      <div class="legacy-card">
+        <h3>Ada Lovelace Day</h3>
+        <p>Celebrated each October, it honors women in science and technology in her name, keeping her story part of the present.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">In tribute to Ada Lovelace (1815–1852). Portrait above is an original illustration, not a photograph.</div>
+</footer>
+
+</body>
+</html>
