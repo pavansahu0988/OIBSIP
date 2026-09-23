@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SecureAuth — Login &amp; Registration Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@500;600;700;800&family=Mulish:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1321; --surface:#141B2E; --panel:#1A2338; --ink:#EAF0FA; --muted:#8593AE;
+    --accent:#4F8CFF; --accent2:#00C2CB; --danger:#FF5C7A; --danger-soft:rgba(255,92,122,0.1);
+    --success:#33D69F; --success-soft:rgba(51,214,159,0.1); --line:rgba(234,240,250,0.1);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Mulish', sans-serif; background:var(--bg); color:var(--ink);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:40px 16px calc(40px + env(safe-area-inset-bottom,0px));
+    padding-top:calc(40px + env(safe-area-inset-top,0px));
+  }
+  h1,h2{font-family:'Urbanist', sans-serif; font-weight:700;}
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:34px;}
+  .brand svg{width:22px; height:22px; color:var(--accent);}
+  .brand span{font-family:'Urbanist', sans-serif; font-weight:800; font-size:1.15rem;}
+
+  .card{
+    width:100%; max-width:400px; background:var(--surface); border:1px solid var(--line);
+    border-radius:18px; padding:32px; box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+
+  .tabs{display:flex; background:var(--panel); border-radius:12px; padding:4px; margin-bottom:26px;}
+  .tab{
+    flex:1; text-align:center; padding:10px; border-radius:9px; font-weight:700; font-size:0.92rem;
+    color:var(--muted); cursor:pointer; transition:all .2s ease; font-family:'Urbanist', sans-serif;
+  }
+  .tab.active{background:var(--accent); color:#fff;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:0.84rem; font-weight:600; color:var(--muted); margin-bottom:7px;}
+  .field input{
+    width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px;
+    background:var(--panel); color:var(--ink); font-family:'Mulish', sans-serif; font-size:0.96rem;
+    transition:border-color .2s ease;
+  }
+  .field input:focus{outline:none; border-color:var(--accent);}
+  .field input.invalid{border-color:var(--danger);}
+
+  .pw-rules{display:flex; flex-direction:column; gap:5px; margin:10px 0 4px; font-size:0.8rem;}
+  .pw-rules .rule{display:flex; align-items:center; gap:6px; color:var(--muted);}
+  .pw-rules .rule.met{color:var(--success);}
+  .pw-rules svg{width:13px; height:13px; flex-shrink:0;}
+
+  .banner{
+    display:none; align-items:flex-start; gap:8px; padding:11px 13px; border-radius:10px;
+    font-size:0.85rem; margin-bottom:16px; line-height:1.4;
+  }
+  .banner.show{display:flex;}
+  .banner.error{background:var(--danger-soft); color:var(--danger); border:1px solid rgba(255,92,122,0.25);}
+  .banner.success{background:var(--success-soft); color:var(--success); border:1px solid rgba(51,214,159,0.25);}
+  .banner svg{width:15px; height:15px; margin-top:2px; flex-shrink:0;}
+
+  .submit-btn{
+    width:100%; padding:13px; border:none; border-radius:10px; background:var(--accent); color:#fff;
+    font-family:'Urbanist', sans-serif; font-weight:700; font-size:0.98rem; cursor:pointer; margin-top:6px;
+    transition:background .2s ease, transform .1s ease;
+  }
+  .submit-btn:hover{background:#3E77E8;}
+  .submit-btn:active{transform:scale(0.98);}
+
+  .hint{text-align:center; margin-top:18px; font-size:0.85rem; color:var(--muted);}
+  .hint a{color:var(--accent); font-weight:600; cursor:pointer;}
+
+  /* Protected dashboard */
+  .dash{text-align:center;}
+  .dash .badge{
+    width:56px; height:56px; border-radius:50%; background:var(--success-soft); color:var(--success);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+  }
+  .dash .badge svg{width:26px; height:26px;}
+  .dash h2{font-size:1.3rem; margin-bottom:8px;}
+  .dash p{color:var(--muted); font-size:0.94rem; margin-bottom:26px;}
+  .dash .protected-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px;
+    text-align:left; margin-bottom:22px; font-size:0.9rem; color:var(--muted); line-height:1.6;
+  }
+  .logout-btn{
+    width:100%; padding:12px; border:1.5px solid var(--line); border-radius:10px; background:transparent;
+    color:var(--ink); font-family:'Urbanist', sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .logout-btn:hover{border-color:var(--danger); color:var(--danger); background:var(--danger-soft);}
+
+  .disclaimer{max-width:400px; text-align:center; color:var(--muted); font-size:0.78rem; margin-top:20px; line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+  <span>SecureAuth</span>
+</div>
+
+<div class="card">
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="login">Login</div>
+    <div class="tab" data-tab="register">Register</div>
+  </div>
+
+  <!-- LOGIN VIEW -->
+  <div class="view active" id="loginView">
+    <div class="banner" id="loginBanner"></div>
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginUser">Username or email</label>
+        <input type="text" id="loginUser" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+    <p class="hint">No account yet? <a data-tab="register">Register instead</a></p>
+  </div>
+
+  <!-- REGISTER VIEW -->
+  <div class="view" id="registerView">
+    <div class="banner" id="registerBanner"></div>
+    <form id="registerForm" novalidate>
+      <div class="field">
+        <label for="regUser">Username or email</label>
+        <input type="text" id="regUser" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="regPass">Password</label>
+        <input type="password" id="regPass" autocomplete="new-password" required>
+        <div class="pw-rules">
+          <div class="rule" id="ruleLen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg><span>At least 8 characters</span></div>
+          <div class="rule" id="ruleNum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg><span>At least 1 number</span></div>
+        </div>
+      </div>
+      <button type="submit" class="submit-btn">Register</button>
+    </form>
+    <p class="hint">Already have an account? <a data-tab="login">Login instead</a></p>
+  </div>
+
+  <!-- PROTECTED DASHBOARD -->
+  <div class="view dash" id="dashView">
+    <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h2 id="welcomeText">Welcome!</h2>
+    <p>You're viewing a protected page — only visible after a successful login.</p>
+    <div class="protected-box">
+      This content is only rendered once <strong>SecureAuth</strong> confirms an active session. In a real app, this page would load user-specific data from a server that verifies your session token on every request.
+    </div>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </div>
+
+</div>
+
+<p class="disclaimer">Demo only — accounts and password hashes are stored in this browser's localStorage, not on a server. Don't reuse a real password here.</p>
+
+<script>
+  const USERS_KEY = 'auth-users-v1';
+  const SESSION_KEY = 'auth-session-v1';
+
+  const tabs = document.querySelectorAll('.tab, .hint a');
+  const views = { login: document.getElementById('loginView'), register: document.getElementById('registerView'), dash: document.getElementById('dashView') };
+  const tabButtons = document.querySelectorAll('#tabs .tab');
+
+  function showView(name){
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+    document.getElementById('tabs').style.display = name === 'dash' ? 'none' : 'flex';
+    tabButtons.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    clearBanner('loginBanner'); clearBanner('registerBanner');
+  }
+
+  tabs.forEach(el => {
+    if(el.dataset.tab) el.addEventListener('click', () => showView(el.dataset.tab));
+  });
+
+  function showBanner(id, type, msg){
+    const el = document.getElementById(id);
+    el.className = 'banner show ' + type;
+    const icon = type === 'error'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+    el.innerHTML = icon + '<span>' + msg + '</span>';
+  }
+  function clearBanner(id){
+    const el = document.getElementById(id);
+    el.className = 'banner';
+    el.innerHTML = '';
+  }
+
+  async function sha256(text){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function getUsers(){
+    try{ return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveUsers(users){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+  function normalize(u){ return u.trim().toLowerCase(); }
+
+  function validatePassword(pw){
+    return { len: pw.length >= 8, num: /\d/.test(pw) };
+  }
+
+  const regPassInput = document.getElementById('regPass');
+  const ruleLen = document.getElementById('ruleLen');
+  const ruleNum = document.getElementById('ruleNum');
+  regPassInput.addEventListener('input', () => {
+    const r = validatePassword(regPassInput.value);
+    ruleLen.classList.toggle('met', r.len);
+    ruleNum.classList.toggle('met', r.num);
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearBanner('registerBanner');
+    const userRaw = document.getElementById('regUser').value;
+    const pass = regPassInput.value;
+    const user = userRaw.trim();
+
+    if(!user){ showBanner('registerBanner','error','Enter a username or email.'); return; }
+    const rules = validatePassword(pass);
+    if(!rules.len || !rules.num){
+      showBanner('registerBanner','error','Password must be at least 8 characters and include at least 1 number.');
+      return;
+    }
+    const users = getUsers();
+    if(users.some(u => u.key === normalize(user))){
+      showBanner('registerBanner','error','An account with that username or email already exists.');
+      return;
+    }
+    const passwordHash = await sha256(pass);
+    users.push({ key: normalize(user), display: user, passwordHash, createdAt: Date.now() });
+    saveUsers(users);
+    showBanner('registerBanner','success','Account created! You can log in now.');
+    document.getElementById('registerForm').reset();
+    ruleLen.classList.remove('met'); ruleNum.classList.remove('met');
+    setTimeout(() => {
+      document.getElementById('loginUser').value = user;
+      showView('login');
+    }, 900);
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearBanner('loginBanner');
+    const userRaw = document.getElementById('loginUser').value;
+    const pass = document.getElementById('loginPass').value;
+    const users = getUsers();
+    const account = users.find(u => u.key === normalize(userRaw));
+    const hash = await sha256(pass);
+
+    if(!account || account.passwordHash !== hash){
+      showBanner('loginBanner','error','Incorrect username or password.');
+      return;
+    }
+    localStorage.setItem(SESSION_KEY, account.key);
+    enterDashboard(account.display);
+  });
+
+  function enterDashboard(displayName){
+    document.getElementById('welcomeText').textContent = `Welcome, ${displayName}!`;
+    showView('dash');
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(SESSION_KEY);
+    document.getElementById('loginForm').reset();
+    showView('login');
+  });
+
+  (function init(){
+    const sessionKey = localStorage.getItem(SESSION_KEY);
+    if(sessionKey){
+      const users = getUsers();
+      const account = users.find(u => u.key === sessionKey);
+      if(account){ enterDashboard(account.display); return; }
+    }
+    showView('login');
+  })();
+</script>
+</body>
+</html>
