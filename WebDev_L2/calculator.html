@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1E1B2E; --panel:#252140; --display:#141225;
+    --key:#2C2848; --key-hover:#38315C; --op:#7C5CFC; --op-hover:#8F72FF;
+    --eq:#16D9C0; --eq-hover:#2AE6CD; --func:#3A3560; --func-hover:#463E75;
+    --text:#F1F0F8; --muted:#8B84AC; --err:#FF5D6C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Sora', sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));
+    padding-top:calc(24px + env(safe-area-inset-top,0px));
+  }
+  .calc{
+    width:100%; max-width:340px; background:var(--panel); border-radius:22px;
+    padding:20px; box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .display{
+    background:var(--display); border-radius:16px; padding:22px 18px 18px;
+    margin-bottom:18px; text-align:right; min-height:96px; display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  .prev-line{
+    font-family:'JetBrains Mono', monospace; font-size:0.92rem; color:var(--muted);
+    min-height:1.2em; overflow-x:auto; white-space:nowrap;
+  }
+  .current-line{
+    font-family:'JetBrains Mono', monospace; font-weight:600; margin-top:6px;
+    font-size:clamp(1.6rem, 8vw, 2.4rem); overflow-x:auto; white-space:nowrap; letter-spacing:0.01em;
+  }
+  .current-line.error{color:var(--err); font-size:1.3rem;}
+
+  .pad{display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;}
+  button{
+    border:none; border-radius:14px; font-family:'Sora', sans-serif; font-weight:600;
+    font-size:1.15rem; padding:0; height:58px; color:var(--text); background:var(--key);
+    cursor:pointer; transition:background .15s ease, transform .1s ease;
+  }
+  button:active{transform:scale(0.95);}
+  button:hover{background:var(--key-hover);}
+  .btn-func{background:var(--func); color:var(--text); font-size:1rem;}
+  .btn-func:hover{background:var(--func-hover);}
+  .btn-op{background:var(--op); color:#fff; font-size:1.3rem;}
+  .btn-op:hover{background:var(--op-hover);}
+  .btn-op.active-op{outline:2px solid #fff; outline-offset:-2px;}
+  .btn-eq{background:var(--eq); color:#0F1420; font-size:1.3rem;}
+  .btn-eq:hover{background:var(--eq-hover);}
+  .span2{grid-column:span 2;}
+
+  @media (max-width:360px){
+    button{height:52px; font-size:1.05rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="calc">
+  <div class="display">
+    <div class="prev-line" id="prevLine">&nbsp;</div>
+    <div class="current-line" id="currentLine">0</div>
+  </div>
+
+  <div class="pad" id="pad">
+    <button class="btn-func" data-action="clear">C</button>
+    <button class="btn-func" data-action="backspace">⌫</button>
+    <button class="btn-func" data-action="percent">%</button>
+    <button class="btn-op" data-op="÷">÷</button>
+
+    <button data-num="7">7</button>
+    <button data-num="8">8</button>
+    <button data-num="9">9</button>
+    <button class="btn-op" data-op="×">×</button>
+
+    <button data-num="4">4</button>
+    <button data-num="5">5</button>
+    <button data-num="6">6</button>
+    <button class="btn-op" data-op="−">−</button>
+
+    <button data-num="1">1</button>
+    <button data-num="2">2</button>
+    <button data-num="3">3</button>
+    <button class="btn-op" data-op="+">+</button>
+
+    <button class="span2" data-num="0">0</button>
+    <button data-action="decimal">.</button>
+    <button class="btn-eq" data-action="equals">=</button>
+  </div>
+</div>
+
+<script>
+  const prevLine = document.getElementById('prevLine');
+  const currentLine = document.getElementById('currentLine');
+  const pad = document.getElementById('pad');
+
+  let current = '0';
+  let previous = null;
+  let operator = null;
+  let resetNext = false;
+  let isError = false;
+
+  function render(){
+    currentLine.classList.toggle('error', isError);
+    currentLine.textContent = isError ? current : formatDisplay(current);
+    prevLine.textContent = (previous !== null && operator)
+      ? `${formatDisplay(previous)} ${operator}`
+      : '\u00A0';
+
+    document.querySelectorAll('.btn-op').forEach(b => {
+      b.classList.toggle('active-op', operator === b.dataset.op && !isError);
+    });
+  }
+
+  function formatDisplay(numStr){
+    if(numStr === '' || numStr === '-') return numStr;
+    const n = parseFloat(numStr);
+    if(!isFinite(n)) return numStr;
+    if(Math.abs(n) >= 1e12 || (Math.abs(n) < 1e-9 && n !== 0)) return n.toExponential(4);
+    let s = numStr;
+    if(s.length > 14) s = n.toPrecision(10).toString();
+    return s;
+  }
+
+  function inputDigit(d){
+    if(isError) resetAll();
+    if(resetNext){ current = '0'; resetNext = false; }
+    if(current === '0') current = d;
+    else if(current.replace('-','').length < 15) current += d;
+    render();
+  }
+
+  function inputDecimal(){
+    if(isError) resetAll();
+    if(resetNext){ current = '0'; resetNext = false; }
+    if(!current.includes('.')) current += '.';
+    render();
+  }
+
+  function setOperator(op){
+    if(isError) return;
+    if(previous !== null && operator && !resetNext){
+      compute();
+      if(isError) return;
+    } else {
+      previous = current;
+    }
+    operator = op;
+    resetNext = true;
+    render();
+  }
+
+  function compute(){
+    const a = parseFloat(previous);
+    const b = parseFloat(current);
+    let result;
+    switch(operator){
+      case '+': result = a + b; break;
+      case '−': result = a - b; break;
+      case '×': result = a * b; break;
+      case '÷':
+        if(b === 0){
+          triggerError("Can't divide by 0");
+          return;
+        }
+        result = a / b;
+        break;
+      default: return;
+    }
+    current = trimFloat(result);
+    previous = null;
+    operator = null;
+  }
+
+  function trimFloat(n){
+    if(!isFinite(n)) return '0';
+    let r = Math.round(n * 1e10) / 1e10;
+    return r.toString();
+  }
+
+  function triggerError(msg){
+    isError = true;
+    current = msg;
+    previous = null;
+    operator = null;
+    resetNext = true;
+    render();
+  }
+
+  function resetAll(){
+    current = '0'; previous = null; operator = null; resetNext = false; isError = false;
+  }
+
+  function backspace(){
+    if(isError){ resetAll(); render(); return; }
+    if(resetNext) return;
+    current = current.length > 1 ? current.slice(0, -1) : '0';
+    render();
+  }
+
+  function percent(){
+    if(isError) resetAll();
+    const n = parseFloat(current);
+    if(!isFinite(n)) return;
+    current = trimFloat(n / 100);
+    render();
+  }
+
+  function equals(){
+    if(isError) return;
+    if(operator === null || previous === null) return;
+    compute();
+    resetNext = true;
+    render();
+  }
+
+  pad.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    if(btn.dataset.num !== undefined) inputDigit(btn.dataset.num);
+    else if(btn.dataset.op) setOperator(btn.dataset.op);
+    else if(btn.dataset.action === 'clear') { resetAll(); render(); }
+    else if(btn.dataset.action === 'backspace') backspace();
+    else if(btn.dataset.action === 'decimal') inputDecimal();
+    else if(btn.dataset.action === 'equals') equals();
+    else if(btn.dataset.action === 'percent') percent();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key >= '0' && e.key <= '9') inputDigit(e.key);
+    else if(e.key === '.') inputDecimal();
+    else if(e.key === '+') setOperator('+');
+    else if(e.key === '-') setOperator('−');
+    else if(e.key === '*') setOperator('×');
+    else if(e.key === '/') { e.preventDefault(); setOperator('÷'); }
+    else if(e.key === 'Enter' || e.key === '=') equals();
+    else if(e.key === 'Backspace') backspace();
+    else if(e.key === 'Escape') { resetAll(); render(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
